@@ -23,6 +23,14 @@
                         <b-row>
                             <b-col sm="12">
                             <b-form-group>
+                                <label for="imagen">Url Imagen </label>
+                                <b-form-input v-model="producto.imagen" type="url" id="imagen" placeholder="https://."></b-form-input>
+                            </b-form-group>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col sm="12">
+                            <b-form-group>
                                 <label for="ccnumber">Precio $</label>
                                 <b-form-input v-model="producto.precio" type="number" id="ccnumber" required></b-form-input>
                             </b-form-group>
@@ -55,15 +63,15 @@
 </template>
 <script>
 export default {
-  name: 'productocreate',
+  name: 'CrearProducto',
   data () {
     return {
-      producto:{name:'',precio:0,descripcion:''}
+      producto:{name:'',precio:0,descripcion:'',imagen:''}
     }
   },
   methods: {
     crear_producto () {
-      var url=process.env.VUE_APP_API+'productos/store';
+      var url=process.env.VUE_APP_API_TEST+'productos/store';
             axios.post(url,this.producto).then(response=>{
                 this.resetProducto();
                 toastr.success('Producto Agreagado Correctamente')

@@ -71,7 +71,9 @@
                     <b-modal id="myModal" ref = "myModalRef" @ok="AddboletaProduto" size="lg"  title="Productos">
                     <b-table striped hover :items="productos" :fields="fields">
                         <template slot="opciones" slot-scope="row">
-                            <b-form-checkbox @click.native.stop @change="addI(row.item,row.detailsShowing)" v-model="row.detailsShowing">
+                            <b-form-checkbox @click.native.stop
+                                @change="addI(row.item,row.detailsShowing)"
+                                v-model="row.detailsShowing">
                                 Agregar A Boleta
                         </b-form-checkbox>
                         </template>
@@ -82,13 +84,9 @@
                     <b-card><!-- Tabla de boletaProductos -->
                         <table class="table bordered">
                         <tr>
-                            <th>Cantidad</th>
-                            <th>Producto</th>
-                            <th>P.Unitario</th>
-                            <th>Importe</th>
-                            <th>Observacion</th>
+                            <th>Cantidad</th><th>Producto</th><th>P.Unitario</th><th>Importe</th><th>Observacion</th>
                         </tr>
-                        <tr v-for="prod in boletaproductos">
+                        <tr v-for="prod in boleta.productos">
                             <td><input v-model="prod.cantidad" type="number" min="0" class="form-control" style="width:80px"></td>
                             <td v-text="prod.name"></td>
                             <td v-text="prod.precio"></td>
@@ -110,7 +108,7 @@
                                     <b-input-group-prepend>
                                     <b-input-group-text>S/</b-input-group-text>
                                     </b-input-group-prepend>
-                                    <b-form-input v-model="descuento" id="desc" type="number" min="0" style="width:90px" required></b-form-input>                                    
+                                    <b-form-input v-model="boleta.descuento" id="desc" type="number" min="0" style="width:90px" required></b-form-input>                                    
                                 </b-input-group>
                             </td>
                         </tr>
@@ -136,49 +134,57 @@
 </template>
 <script>
 export default {
-  name: 'productocreate',
+  name: 'BoletaCreate',
     data () {
         return {
-        boleta:{dni:'',apepaterno:'',apematerno:'',nombres:'',fecha:''},
+        boleta:{dni:'',apepaterno:'',apematerno:'',nombres:'',fecha:'',productos:[],total:0,descuento:0},
         dniDesc:'Let us know your dni.',
         producto:{name:'',precio:0,descripcion:''},
         productos:[],
         boletaproductos:[],
-        descuento:0,
+        //descuento:0,
         fields: [ 'name', 'descripcion', 'precio', 'opciones'],
         }
     },
     computed: {
-         pagototal: function () {
-             var total=0
-        for (let index = 0; index < this.boletaproductos.length; index++) {
-            total=total+this.boletaproductos[index].importe
-        }
-        return total-this.descuento
+        pagototal: function () {
+            var total=0
+            for (let index = 0; index < this.boleta.productos.length; index++) {
+                total=total+this.boleta.productos[index].importe
+            }
+            return total-this.boleta.descuento
         }       
     },
     methods: {        
         form_newboleta () {
-        /*var url=process.env.VUE_APP_API+'productos/store';
-                axios.post(url,this.producto).then(response=>{
-                    //this.resetProducto();
-                    toastr.success('Producto Agreagado Correctamente')
-                    console.log(response)
-                }).catch(error=> {
-                    console.log(error)
-                });*/
+            this.boleta.total=this.pagototal;
+            var url=process.env.VUE_APP_API_TEST+'boletas/store';
+            axios.post(url,this.boleta).then(response=>{
+                //this.resetProducto();
+                toastr.success('Boleta Creado Correctamente')
+                console.log(response)
+            }).catch(error=> {
+                console.log(error)
+            });
         },
         addI(producto,vmodel){
+            console.log(vmodel)
             if (vmodel==false) {
-            this.boletaproductos.push({id:producto.id,name:producto.name,precio:producto.precio,cantidad:1,importe:producto.precio,descripcion:''})
-            //console.log('add')
+                this.boleta.productos.push({id:producto.id,name:producto.name,precio:producto.precio,cantidad:1,importe:producto.precio,descripcion:''})
+            console.log('add')
             }else{
-                this.boletaproductos = this.boletaproductos.filter(item => item.id != producto.id);
-                //console.log("remove id:"+producto.id)
+                this.boleta.productos = this.boleta.productos.filter(item => item.id != producto.id);
+                console.log("remove id:"+producto.id)
             }
         },
         AddboletaProduto(){
             //Eliminar productos repetidos en boletaproductos
+            var hash = {};
+            this.boleta.productos = this.boleta.productos.filter(function(current) {
+                var exists = !hash[current.id] || false;
+                hash[current.id] = true;
+                return exists;
+            });
         },
         buscar_dni : function(){
             var url ='https://sitaav.org/api/certificados/dni'
@@ -198,7 +204,7 @@ export default {
             })
         },
         showModal () {
-            var url=process.env.VUE_APP_API+'productos';
+            var url=process.env.VUE_APP_API_TEST+'productos';
             axios.get(url).then(response=>{
                 this.productos=response.data.productos;
             }).catch(error=> {
