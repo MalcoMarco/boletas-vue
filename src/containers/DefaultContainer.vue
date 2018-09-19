@@ -7,13 +7,13 @@
         <img class="navbar-brand-minimized" src="img/brand/sygnet.svg" width="30" height="30" alt="CoreUI Logo">
       </b-link>
       <SidebarToggler class="d-md-down-none" display="lg" />
-      <b-navbar-nav class="d-md-down-none">
+      <!-- <b-navbar-nav class="d-md-down-none">
         <b-nav-item class="px-3" to="/dashboard">Dashboard</b-nav-item>
         <b-nav-item class="px-3" to="/users" exact>Users</b-nav-item>
         <b-nav-item class="px-3">Settings</b-nav-item>
-      </b-navbar-nav>
+      </b-navbar-nav> -->
       <b-navbar-nav class="ml-auto">
-        <b-nav-item class="d-md-down-none">
+        <!-- <b-nav-item class="d-md-down-none">
           <i class="icon-bell"></i>
           <b-badge pill variant="danger">5</b-badge>
         </b-nav-item>
@@ -22,10 +22,10 @@
         </b-nav-item>
         <b-nav-item class="d-md-down-none">
           <i class="icon-location-pin"></i>
-        </b-nav-item>
+        </b-nav-item> -->
         <DefaultHeaderDropdownAccnt/>
       </b-navbar-nav>
-      <AsideToggler class="d-none d-lg-block" />
+      <!-- <AsideToggler class="d-none d-lg-block" /> -->
       <!--<AsideToggler class="d-lg-none" mobile />-->
     </AppHeader>
     <div class="app-body">
@@ -63,14 +63,13 @@
 
 <script>
 import nav from '@/_nav'
-import { Header as AppHeader, SidebarToggler, Sidebar as AppSidebar, SidebarFooter, SidebarForm, SidebarHeader, SidebarMinimizer, SidebarNav, Aside as AppAside, AsideToggler, Footer as TheFooter, Breadcrumb } from '@coreui/vue'
-//import DefaultAside from './DefaultAside'
+import { Header as AppHeader, SidebarToggler, Sidebar as AppSidebar, SidebarFooter, SidebarForm,
+ SidebarHeader, SidebarMinimizer, SidebarNav, Aside as AppAside, Footer as TheFooter, Breadcrumb } from '@coreui/vue'
 import DefaultHeaderDropdownAccnt from './DefaultHeaderDropdownAccnt'
-
 export default {
   name: 'full',
   components: {
-    AsideToggler,
+    //AsideToggler,
     AppHeader,
     AppSidebar,
     AppAside,
@@ -84,6 +83,31 @@ export default {
     SidebarHeader,
     SidebarNav,
     SidebarMinimizer
+  },
+  beforeCreate: function () {
+    //verificar que el token no haya expirado
+    if (this.$session.exists()) {
+        window.axios.defaults.headers.common['Authorization'] = "Bearer "+this.$session.get('token')
+        var url=process.env.VUE_APP_API_TEST+'test'
+        axios.get(url).then(response=>{
+            //this.resetProducto();
+            toastr.success('sesion test ok')            
+            console.log(response)
+             
+        }).catch(error=> {
+          if (error.response.status == 401) {
+            //this.$session.destroy()
+            //this.$router.push({name:'Login'})
+            toastr.success('sesion expiredxdxdx 401') 
+          }
+          toastr.error('error test')
+          console.log("error_0: "+error)
+        });
+    }else{
+      this.$router.push({name:'Login'})
+    }
+     //nota: este header no se mantiene al recargar la pagina, tengo que ponerlo a cada peticion
+     //revisar no debe funcionar asi
   },
   mounted() {
     console.log(process.env)

@@ -71,8 +71,8 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
     {
-      path: '/',
-      redirect: '/productos/list',
+      path: '/pages',
+      redirect: '/pages/productos/list',
       name: 'Home',
       component: DefaultContainer,
       children: [
@@ -323,8 +323,8 @@ export default new Router({
       ]
     },
     {
-      path: '/pages',
-      redirect: '/pages/404',
+      path: '/',
+      redirect: '/login',
       name: 'Pages',
       component: {
         render (c) { return c('router-view') }

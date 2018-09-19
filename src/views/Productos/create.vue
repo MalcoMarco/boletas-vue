@@ -32,7 +32,8 @@
                             <b-col sm="12">
                             <b-form-group>
                                 <label for="ccnumber">Precio $</label>
-                                <b-form-input v-model="producto.precio" type="number" id="ccnumber" required></b-form-input>
+                                <InputDecimal v-model="producto.precio" id="ccnumber"></InputDecimal>
+                                <!-- <b-form-input v-model="producto.precio" type="text" id="ccnumber" required></b-form-input> -->
                             </b-form-group>
                             </b-col>
                         </b-row>
@@ -62,13 +63,15 @@
     </div>
 </template>
 <script>
+import InputDecimal from '@/views/widgets/InputDecimal'
 export default {
-  name: 'CrearProducto',
-  data () {
-    return {
-      producto:{name:'',precio:0,descripcion:'',imagen:''}
-    }
-  },
+    name: 'CrearProducto',
+    components: {InputDecimal:InputDecimal},
+    data () {
+        return {
+        producto:{name:'',precio:0,descripcion:'',imagen:''}
+        }
+    },
   methods: {
     crear_producto () {
       var url=process.env.VUE_APP_API_TEST+'productos/store';

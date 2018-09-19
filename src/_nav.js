@@ -20,12 +20,12 @@ export default {
     },
     {
       name: 'Mis Productos',
-      url: '/productos/list',
+      url: '/pages/productos/list',
       icon: 'icon-drop'
     },
     {
       name: 'Crear',
-      url: '/productos/create',
+      url: '/pages/productos/create',
       icon: 'icon-drop'
     },
     {
@@ -39,12 +39,12 @@ export default {
     },
     {
       name: 'Nueva Boleta',
-      url: '/boleta/create',
+      url: '/pages/boleta/create',
       icon: 'icon-calculator'
     },
     {
       name: 'Mis Boletas',
-      url: '/productos/list',
+      url: '/pages/productos/list',
       icon: 'icon-calculator'
     },
     {
@@ -63,7 +63,7 @@ export default {
     },
     {
       name: 'Mis Clientes',
-      url: '/productos/list',
+      url: '/pages/productos/list',
       icon: 'icon-drop'
     },
     {

@@ -14,7 +14,7 @@
             <b-row>
                 <b-col sm="3" class="offset-9">
                     <b-form-group>
-                        <b-form-input  type="date" id="name" required></b-form-input>
+                        <b-form-input v-model="boleta.fecha"  type="date" id="name" required></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col sm="12">
@@ -60,33 +60,34 @@
                                     breakpoint="md"                                    
                                     label="Direccion:"
                                     label-for="Direccion">
-                        <b-form-input id="Direccion"></b-form-input>
+                        <b-form-input v-model="boleta.direccion" id="Direccion"></b-form-input>
                     </b-form-group>
                 </b-col>
             </b-row>
             <b-row class="justify-content-center">
                 <b-col sm="12">
                     <b-button @click="showModal" variant="success" class="float-right m-2">Elegir Productos</b-button> 
-                    <!-- the modal -->
-                    <b-modal id="myModal" ref = "myModalRef" @ok="AddboletaProduto" size="lg"  title="Productos">
-                    <b-table striped hover :items="productos" :fields="fields">
-                        <template slot="opciones" slot-scope="row">
-                            <b-form-checkbox @click.native.stop
-                                @change="addI(row.item,row.detailsShowing)"
-                                v-model="row.detailsShowing">
-                                Agregar A Boleta
-                        </b-form-checkbox>
+                    <!-- the modal elegir productos -->
+                    <b-modal id="myModal" ref="myModalRef" @ok="okModalProductos" size="lg"  title="Productos">
+                    <b-table striped responsive :items="productos" :fields="fields">
+                        <template responsive slot="opciones" slot-scope="row">
+                            <input @click.stop type="checkbox"
+                                @change="addI(row.item,checkedItems[row.item.id])"
+                                v-model="checkedItems[row.item.id]">
+                                {{checkedItems[row.item.id]==true?'Agregado':'' }}
+                        </template>
+                        <template slot="row-details" slot-scope="row">
                         </template>
                     </b-table>
                     </b-modal>      
                 </b-col>             
                 <b-col sm="12">
-                    <b-card><!-- Tabla de boletaProductos -->
+                    <b-card class="table-responsive"><!-- Tabla de boletaProductos -->
                         <table class="table bordered">
                         <tr>
                             <th>Cantidad</th><th>Producto</th><th>P.Unitario</th><th>Importe</th><th>Observacion</th>
                         </tr>
-                        <tr v-for="prod in boleta.productos">
+                        <tr v-for="prod in boleta.productos" :key="prod.id">
                             <td><input v-model="prod.cantidad" type="number" min="0" class="form-control" style="width:80px"></td>
                             <td v-text="prod.name"></td>
                             <td v-text="prod.precio"></td>
@@ -137,13 +138,14 @@ export default {
   name: 'BoletaCreate',
     data () {
         return {
-        boleta:{dni:'',apepaterno:'',apematerno:'',nombres:'',fecha:'',productos:[],total:0,descuento:0},
+        boleta:{dni:'',apepaterno:'',apematerno:'',nombres:'',fecha:'' ,direccion:'',productos:[],total:0,descuento:0},
         dniDesc:'Let us know your dni.',
         producto:{name:'',precio:0,descripcion:''},
         productos:[],
+        checkedItems: [],
         boletaproductos:[],
         //descuento:0,
-        fields: [ 'name', 'descripcion', 'precio', 'opciones'],
+        fields: [ 'name', 'precio', 'opciones'],
         }
     },
     computed: {
@@ -168,16 +170,19 @@ export default {
             });
         },
         addI(producto,vmodel){
-            console.log(vmodel)
-            if (vmodel==false) {
-                this.boleta.productos.push({id:producto.id,name:producto.name,precio:producto.precio,cantidad:1,importe:producto.precio,descripcion:''})
-            console.log('add')
+            console.log("es: "+vmodel)
+            //console.log("..")
+            if (vmodel) {
+                this.boleta.productos.push({id:producto.id, name:producto.name,
+                precio:producto.precio, cantidad:1,
+                importe:producto.precio, descripcion:''})
+            console.log('add: '+producto.id)
             }else{
                 this.boleta.productos = this.boleta.productos.filter(item => item.id != producto.id);
-                console.log("remove id:"+producto.id)
+                console.log("remove id: "+producto.id)
             }
         },
-        AddboletaProduto(){
+        okModalProductos(){
             //Eliminar productos repetidos en boletaproductos
             var hash = {};
             this.boleta.productos = this.boleta.productos.filter(function(current) {

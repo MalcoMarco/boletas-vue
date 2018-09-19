@@ -11,6 +11,8 @@ import App from './App'
 import router from './router'
 window.toastr = require('toastr');
 
+import VueSession from 'vue-session'
+Vue.use(VueSession)
 // todo
 // cssVars()
 
