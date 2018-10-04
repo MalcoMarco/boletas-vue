@@ -59,18 +59,28 @@ export default {
     }
   },
   beforeCreate: function () {
-    if (this.$session.exists()) {
-      //si ya existe la sesion, validar y redirigir a home
-      //aun no se como validar el token :C
-     // this.$router.push({name:'Home'})
-     console.log(this.$session.getAll())
+    if (this.$session.exists()) {//validamos la sesion
+      //si ya existe la $sesion, validar y redirigir a home
+      var url=process.env.VUE_APP_API_TEST+'test?token='+this.$session.get('token')
+      axios.get(url).then(response=>{
+        //sesion is oki vamos a home
+        console.log(this.$session.getAll()) 
+        this.$router.push({name:'Home'})
+      }).catch(error=> {
+        console.log(error.response.status)
+        if (error.response.status === 401) {
+          //error 401 => eliminamos la sesion
+          console.log('unauthorized, logging out ...');
+          this.$session.destroy()
+        }
+      })     
     }
   },
   methods:{
     login_user(){
       var url=process.env.VUE_APP_API_TEST+'login';
       axios.post(url,this.auth).then(response=>{
-          //iniciar Sesion
+          //iniciar variables de Sesion
           this.$session.start()
           window.axios.defaults.headers.common['Authorization'] = "Bearer "+response.data.data.token
           this.$session.set('token', response.data.data.token)
@@ -89,17 +99,6 @@ export default {
           //this.resetProducto();
           toastr.success('sesion Cerrada')
           this.$session.destroy()
-          console.log(response)
-      }).catch(error=> {
-        toastr.error('error')
-        console.log(error)
-      });
-    },
-    foo(){
-      var url=process.env.VUE_APP_API_TEST+'test';
-      axios.get(url).then(response=>{
-          //this.resetProducto();
-          //toastr.success('Iniciando sesion')
           console.log(response)
       }).catch(error=> {
         toastr.error('error')

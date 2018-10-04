@@ -64,7 +64,8 @@
 <script>
 import nav from '@/_nav'
 import { Header as AppHeader, SidebarToggler, Sidebar as AppSidebar, SidebarFooter, SidebarForm,
- SidebarHeader, SidebarMinimizer, SidebarNav, Aside as AppAside, Footer as TheFooter, Breadcrumb } from '@coreui/vue'
+ SidebarHeader, SidebarMinimizer, SidebarNav, Aside as AppAside, Footer as TheFooter, Breadcrumb 
+ } from '@coreui/vue'
 import DefaultHeaderDropdownAccnt from './DefaultHeaderDropdownAccnt'
 export default {
   name: 'full',
@@ -87,22 +88,18 @@ export default {
   beforeCreate: function () {
     //verificar que el token no haya expirado
     if (this.$session.exists()) {
+      var url=process.env.VUE_APP_API_TEST+'test?token='+this.$session.get('token')
+      axios.get(url).then(response=>{
         window.axios.defaults.headers.common['Authorization'] = "Bearer "+this.$session.get('token')
-        var url=process.env.VUE_APP_API_TEST+'test'
-        axios.get(url).then(response=>{
-            //this.resetProducto();
-            toastr.success('sesion test ok')            
-            console.log(response)
-             
-        }).catch(error=> {
-          if (error.response.status == 401) {
-            //this.$session.destroy()
-            //this.$router.push({name:'Login'})
-            toastr.success('sesion expiredxdxdx 401') 
-          }
-          toastr.error('error test')
-          console.log("error_0: "+error)
-        });
+        //todo bien con la sesion
+      }).catch(error=> {
+        console.log(error.response.status)
+        if (error.response.status === 401) {
+          //error 401 => eliminamos la sesion
+          this.$session.destroy()
+          this.$router.push({name:'Login'})
+        }
+      }) 
     }else{
       this.$router.push({name:'Login'})
     }

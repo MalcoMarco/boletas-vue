@@ -51,8 +51,8 @@
                             </b-col>
                         </b-row>
                         <div class="form-actions">
-                            <b-button type="submit" class="m-2" variant="primary">Guardar</b-button>
-                            <b-button type="button" @click="resetProducto()"  class="m-2" variant="secondary">Cancel</b-button>
+                            <b-button type="submit" :disabled="btn_status" class="m-2" variant="primary">Guardar</b-button>
+                            <b-button type="button" :disabled="btn_status" @click="resetProducto()"  class="m-2" variant="secondary">Cancel</b-button>
                         </div>
                     </b-card>
                     </form>
@@ -69,19 +69,24 @@ export default {
     components: {InputDecimal:InputDecimal},
     data () {
         return {
-        producto:{name:'',precio:0,descripcion:'',imagen:''}
+        producto:{name:'',precio:0,descripcion:'',imagen:''},
+        btn_status:false
         }
     },
   methods: {
     crear_producto () {
-      var url=process.env.VUE_APP_API_TEST+'productos/store';
-            axios.post(url,this.producto).then(response=>{
-                this.resetProducto();
-                toastr.success('Producto Agreagado Correctamente')
-                console.log(response)
-            }).catch(error=> {
-                console.log(error)
-            });
+        this.btn_status=true
+        var url=process.env.VUE_APP_API_TEST+'productos/store';
+        axios.post(url,this.producto).then(response=>{
+            this.resetProducto();
+            toastr.success('Producto Agreagado Correctamente')
+            console.log(response)
+        }).catch(error=> {
+            console.log(error.response)
+        }).then(function () {
+            // always executed
+            this.btn_status=false
+        });
     },
     resetProducto(){
         this.producto.name=""
